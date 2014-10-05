@@ -68,6 +68,7 @@ public class TestActivity extends Activity implements Response.Listener<String> 
 			}
 		});*/
 		
+		
 		ClientAPI.getComment(queue,groupId, offSet,this);
 		
 //		3 评论的刷新
@@ -76,10 +77,8 @@ public class TestActivity extends Activity implements Response.Listener<String> 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				
 //				获取 评论数据！
 				ClientAPI.getComment(queue, groupId, offSet,TestActivity.this);
-				
 			}
 		});
 		
@@ -87,27 +86,45 @@ public class TestActivity extends Activity implements Response.Listener<String> 
 
 
 /**
-	 * 评论 
+	 * 评论 :
+	 * 
+	 * 有一个问题： 如何判断是评论还是 端子的信息？ JSON数据！
 	 * 
 	 * */
 	@Override
 	public void onResponse(String arg0) {
 		// TODO Auto-generated method stub
 		
+//		TODO 根据 类型 获取 你需要解析的 内容： 因为段子中含有 message 但是 评论中不含有 message信息！
+		if(arg0.contains("message"))
+		{
+//			解析端子：
+			listOnResponse(arg0);
+		}else
+		{
+//			解析评论
+			listCommentOnResponse(arg0);
+		}
+	}
+
+//	解析评论
+	public void listCommentOnResponse(String arg0) 
+	{
 		try {
 			
 			JSONObject json = new JSONObject(arg0);
 		
-//			已经后渠道数据
-//			Log.i("lvoe", "---json"+json.toString());
+	//				已经后渠道数据
+	//				Log.i("lvoe", "---json"+json.toString());
 			
-//			解析返回的数据信息！  分为热门评论和新鲜评论
+	//				解析返回的数据信息！  分为热门评论和新鲜评论
 			CommentList commentList = new CommentList();
+	//				1  解析 评论列表数据：   最终需要将数据数据存入一个comment list 集合中！
 			commentList.pareJson(json);
 			
-//			表示当前的文章的ID
+	//				表示当前的文章的ID
 			long groupId = commentList.getGroupId();
-//			表示评论列表 是否还可以继续加载！
+	//				表示评论列表 是否还可以继续加载！
 			boolean hasMore = commentList.isHasMore();
 			int totalNub = commentList.getTotalMunber();
 			
@@ -116,13 +133,13 @@ public class TestActivity extends Activity implements Response.Listener<String> 
 			Log.i("lvoe", "---offset="+offSet);
 			Log.i("lvoe", "---TotalMunber="+totalNub);
 			
-//			热门评论  第一次 offset 为0 是可能有数据
+	//				热门评论  第一次 offset 为0 是可能有数据
 			List<CommentEntity> top = commentList.getTopComment();
-//			新鲜评论
+	//				新鲜评论
 			List<CommentEntity> recent = commentList.getRecentComment();
 			
-//			TODO 直接把 Comment 提交给 ListView的adapter，  可用于内容数据 更新！
-//			分页表示：  Offset  没回返回 20 条数据！ 通过 hasMore 进行判断 是否还有新的数据加载！
+	//				TODO 直接把 Comment 提交给 ListView的adapter，  可用于内容数据 更新！
+	//				分页表示：  Offset  没回返回 20 条数据！ 通过 hasMore 进行判断 是否还有新的数据加载！
 			
 			if(top != null)
 			{
@@ -140,15 +157,14 @@ public class TestActivity extends Activity implements Response.Listener<String> 
 				}
 			}
 				
-//			如果 有话，继续增加！
+	//				如果 有话，继续增加！
 			offSet+=20;
 			
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
-		
-		
 	}
+	
 	
 	/**
 	 * 类表网络获取回调部分

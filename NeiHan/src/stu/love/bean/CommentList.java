@@ -45,7 +45,6 @@ public class CommentList {
 			
 //			数据
 			JSONArray top= data.optJSONArray("top_comments");
-			Log.i("recent_comments", "----recent_comments="+top.length());
 			if(top!= null)
 			{
 				topComment = new ArrayList<CommentEntity>();
@@ -64,7 +63,6 @@ public class CommentList {
 			
 //			真是的数据
 			JSONArray recent = data.optJSONArray("recent_comments");
-			Log.i("recent_comments", "----recent_comments="+recent.length());
 			if(recent!= null)
 			{
 				recentComment = new ArrayList<CommentEntity>();
