@@ -7,6 +7,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 /**
  * <pre>
  * 评论 接口 返回的  data 数据部分。
@@ -41,9 +43,9 @@ public class CommentList {
 			
 			JSONObject data = json.getJSONObject("data");
 			
-			
 //			数据
 			JSONArray top= data.optJSONArray("top_comments");
+			Log.i("recent_comments", "----recent_comments="+top.length());
 			if(top!= null)
 			{
 				topComment = new ArrayList<CommentEntity>();
@@ -62,6 +64,7 @@ public class CommentList {
 			
 //			真是的数据
 			JSONArray recent = data.optJSONArray("recent_comments");
+			Log.i("recent_comments", "----recent_comments="+recent.length());
 			if(recent!= null)
 			{
 				recentComment = new ArrayList<CommentEntity>();

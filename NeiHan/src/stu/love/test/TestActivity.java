@@ -37,11 +37,13 @@ public class TestActivity extends Activity implements Response.Listener<String> 
 	
 	private Button buttonRefrush;
 	
+	private long lastTime = 0;
+	
 //	对应文本段子的ID
-	long groupId = 3085085832L;
+	long groupId = 3577157367L;
 	
-	private long lastTime = 0 ;
-	
+	final int itemCount = 20;
+
 //	评论的刷新
 	int offSet = 0;
 
@@ -52,7 +54,6 @@ public class TestActivity extends Activity implements Response.Listener<String> 
 
 		// Volley 请求队列
 		queue = Volley.newRequestQueue(this);
-		final int itemCount = 20;
 
 		// 1 获取数据
 //		ClientAPI.getList(queue, CATAGORY_IMAGE, itemCount, lastTime, this);
@@ -67,7 +68,6 @@ public class TestActivity extends Activity implements Response.Listener<String> 
 			}
 		});*/
 		
-		
 		ClientAPI.getComment(queue,groupId, offSet,this);
 		
 //		3 评论的刷新
@@ -77,7 +77,8 @@ public class TestActivity extends Activity implements Response.Listener<String> 
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				
-				ClientAPI.getComment(queue,groupId, offSet,TestActivity.this);
+//				获取 评论数据！
+				ClientAPI.getComment(queue, groupId, offSet,TestActivity.this);
 				
 			}
 		});
@@ -97,7 +98,8 @@ public class TestActivity extends Activity implements Response.Listener<String> 
 			
 			JSONObject json = new JSONObject(arg0);
 		
-			Log.i("lvoe", "---json"+json.toString());
+//			已经后渠道数据
+//			Log.i("lvoe", "---json"+json.toString());
 			
 //			解析返回的数据信息！  分为热门评论和新鲜评论
 			CommentList commentList = new CommentList();
@@ -108,14 +110,11 @@ public class TestActivity extends Activity implements Response.Listener<String> 
 //			表示评论列表 是否还可以继续加载！
 			boolean hasMore = commentList.isHasMore();
 			int totalNub = commentList.getTotalMunber();
+			
 			Log.i("lvoe", "---groupId="+groupId);
 			Log.i("lvoe", "---hasMore="+hasMore);
-			Log.i("lvoe", "---hasMore="+totalNub);
-			
-		
-//			如果 有话，继续增加！
-			offSet+=20;
-		
+			Log.i("lvoe", "---offset="+offSet);
+			Log.i("lvoe", "---TotalMunber="+totalNub);
 			
 //			热门评论  第一次 offset 为0 是可能有数据
 			List<CommentEntity> top = commentList.getTopComment();
@@ -127,20 +126,23 @@ public class TestActivity extends Activity implements Response.Listener<String> 
 			
 			if(top != null)
 			{
-				for(CommentEntity e : top)
+				for(CommentEntity entity : top)
 				{
-					Log.i("lvoe", "---top="+e.toString());
+					Log.i("lvoe", "---top="+entity.getText());
 				}
 				
 			}
 			if(recent != null)
 			{
-				for(CommentEntity e : top)
+				for(CommentEntity entity : recent)
 				{
-					Log.i("lvoe", "---recent="+recent.toString());
+					Log.i("lvoe", "---recent="+entity.getText());
 				}
 			}
 				
+//			如果 有话，继续增加！
+			offSet+=20;
+			
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
