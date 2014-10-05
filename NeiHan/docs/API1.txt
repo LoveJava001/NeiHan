@@ -671,6 +671,8 @@ Content-Length: 119
 
 14. 文本段子列表分页加载接口
 
+min_time=1411887357
+
 GET http://ic.snssdk.com/2/essay/zone/category/data/?category_id=1&level=6&count=30&min_time=1411887357&iid=2337593504&device_id=2757969807&ac=wifi&channel=wandoujia&amp;aid=7&app_name=joke_essay&version_code=302&device_platform=android&device_type=KFTT&os_api=15&os_version=4.0.3&openudid=b90ca6a3a19a78d6 HTTP/1.1
 Accept-Encoding: gzip
 Host: ic.snssdk.com

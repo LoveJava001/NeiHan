@@ -1,15 +1,12 @@
 package stu.love.test;
 
-import java.util.LinkedList;
 import java.util.List;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import stu.love.bean.ADEntity;
-import stu.love.bean.ImageBean;
-import stu.love.bean.ImageUrlList;
+import stu.love.bean.CommentEntity;
+import stu.love.bean.CommentList;
+import stu.love.bean.EntityList;
 import stu.love.bean.TextEntity;
 import stu.love.neihan.R;
 import stu.love.utils.ClientAPI;
@@ -17,6 +14,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.widget.Button;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -34,32 +33,128 @@ public class TestActivity extends Activity implements Response.Listener<String> 
 
 	public static String Tag = "TestActivity";
 
-	private RequestQueue queue;
+	private static RequestQueue queue;
+	
+	private Button buttonRefrush;
+	
+//	对应文本段子的ID
+	long groupId = 3085085832L;
+	
+	private long lastTime = 0 ;
+	
+//	评论的刷新
+	int offSet = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_tes);
+		setContentView(R.layout.activity_test);
 
 		// Volley 请求队列
 		queue = Volley.newRequestQueue(this);
-		int itemCount = 10;
+		final int itemCount = 20;
 
 		// 1 获取数据
-		ClientAPI.getList(queue, CATAGORY_TEXT, itemCount, this);
-
+//		ClientAPI.getList(queue, CATAGORY_IMAGE, itemCount, lastTime, this);
+		
+//		2 刷新数据
+		/*buttonRefrush = (Button) this.findViewById(R.id.reflust);
+		buttonRefrush.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				ClientAPI.getList(queue, CATAGORY_TEXT, itemCount, lastTime, TestActivity.this);
+			}
+		});*/
+		
+		
+		ClientAPI.getComment(queue,groupId, offSet,this);
+		
+//		3 评论的刷新
+		buttonRefrush = (Button) this.findViewById(R.id.reflust);
+		buttonRefrush.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				
+				ClientAPI.getComment(queue,groupId, offSet,TestActivity.this);
+				
+			}
+		});
+		
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.test, menu);
-		return true;
-	}
 
-	// 2 Volley 相应的事件！ 所有的activity 内部的恶fragment 的 都可以使用
+/**
+	 * 评论 
+	 * 
+	 * */
 	@Override
 	public void onResponse(String arg0) {
+		// TODO Auto-generated method stub
+		
+		try {
+			
+			JSONObject json = new JSONObject(arg0);
+		
+			Log.i("lvoe", "---json"+json.toString());
+			
+//			解析返回的数据信息！  分为热门评论和新鲜评论
+			CommentList commentList = new CommentList();
+			commentList.pareJson(json);
+			
+//			表示当前的文章的ID
+			long groupId = commentList.getGroupId();
+//			表示评论列表 是否还可以继续加载！
+			boolean hasMore = commentList.isHasMore();
+			int totalNub = commentList.getTotalMunber();
+			Log.i("lvoe", "---groupId="+groupId);
+			Log.i("lvoe", "---hasMore="+hasMore);
+			Log.i("lvoe", "---hasMore="+totalNub);
+			
+		
+//			如果 有话，继续增加！
+			offSet+=20;
+		
+			
+//			热门评论  第一次 offset 为0 是可能有数据
+			List<CommentEntity> top = commentList.getTopComment();
+//			新鲜评论
+			List<CommentEntity> recent = commentList.getRecentComment();
+			
+//			TODO 直接把 Comment 提交给 ListView的adapter，  可用于内容数据 更新！
+//			分页表示：  Offset  没回返回 20 条数据！ 通过 hasMore 进行判断 是否还有新的数据加载！
+			
+			if(top != null)
+			{
+				for(CommentEntity e : top)
+				{
+					Log.i("lvoe", "---top="+e.toString());
+				}
+				
+			}
+			if(recent != null)
+			{
+				for(CommentEntity e : top)
+				{
+					Log.i("lvoe", "---recent="+recent.toString());
+				}
+			}
+				
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+		
+	}
+	
+	/**
+	 * 类表网络获取回调部分
+	 * 
+	 * @arg0 JSon 字符串！
+	 * 
+	 * */
+	public void listOnResponse(String arg0) {
 		// TODO Auto-generated method stub
 		// 返回的数据：
 
@@ -68,60 +163,43 @@ public class TestActivity extends Activity implements Response.Listener<String> 
 		try {
 			JSONObject obj = new JSONObject(arg0);
 			String str = obj.toString();
-			Log.i(Tag, "---Json data= " + str);
+//			Log.i(Tag, "---Json data= " + str);
 
 			// 获取JsonIMage 对象的数据
 			JSONObject data = obj.getJSONObject("data");
-			// 从Data对象中获取名称为data 的数组。它代表的是 段子列表的数据。
-			JSONArray arr = data.getJSONArray("data");
-			int len = arr.length();
-			if (len > 0) {
-				for (int i = 0; i < len; i++) {
-// 					这种写法很乱！ 很不清晰！
-					JSONObject item = arr.getJSONObject(i);
-					
-					Log.i(Tag, "---item="+item);
-					
-//					获取类型 1 是段子 5 是广告
-					int type = item.getInt("type");
-					
-					if(type==1)
-					{
-//						TODO  处理段子
-						JSONObject group = item.getJSONObject("group");
-						int cid = group.getInt("category_id");
-						TextEntity entity= null;
-						if(cid == 1)
-						{
-//							TODO  文本段子
-							entity = new TextEntity();
-							
-						}else if(cid == 2)
-						{
-//							TODO  图片段子
-							entity = new ImageBean();
-						}
-//						解析数据：
-						entity.pareJson(item);
-						
-						long id = entity.getGroupId();
-						Log.i(Tag, "----getGroupId="+id);
-						
-					}else if(type==5)
-					{
-						
-//						TODO  处理广告的内容
-						ADEntity adEntity = new ADEntity();
-						adEntity.pareJson(item);
-						String url = adEntity.getDownloadUrl();
-						Log.i(Tag, "----adEntity.getDownloadUrl() ="+url);
-						
-					}
-					
-				}
+			
+//			1 解析段子列表的完整数据！  包含 图片 文本 广告！等对象的信息！
+			EntityList entityList = new EntityList();
+			entityList.ParseJson(data);
+			
+//			2 下拉刷新时：  如果 有更新数据的话！ hasMore  false 她的 min_time  为0.
+			if(entityList.isHasMore())
+			{
+//				1 获取下次刷新 时间标志
+				long lastTime = entityList.getMinTime();
+				Log.i(Tag, "---lastTime="+lastTime);
+			}else{
+//				获取提示信息
+				String tip = entityList.getTip();
+				Log.d(Tag, "-----tip"+tip);
 			}
+			
+//			获取段子内容列表！
+			List<TextEntity> entities = entityList.getEntities();
+			
+//			TODO enitities 段子数据的结合 传递给 listView 的Adapter 绑定数据！
+//			之后 
+
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.test, menu);
+		return true;
+	}
+
 }

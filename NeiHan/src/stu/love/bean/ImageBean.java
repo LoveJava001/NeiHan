@@ -23,16 +23,23 @@ public class ImageBean extends TextEntity{
 		type = item.getInt("type");
 		JSONObject group = item.getJSONObject("group");
 		commentCount = group.getInt("comment_count");
-		JSONObject largerImage = group.getJSONObject("large_image");
-		JSONObject midelImage = group.getJSONObject("middle_image");
+		JSONObject largerImage = group.optJSONObject("large_image");
+		JSONObject midelImage = group.optJSONObject("middle_image");
 		groupId = group.getLong("group_id");
 		content = group.getString("content");
 		
 //		urls 图片的url 
 		largeList = new ImageUrlList();
-		largeList.pareJson(largerImage);
+		if(largeList != null)
+		{
+			largeList.pareJson(largerImage);
+		}
+		
 		midelList = new ImageUrlList();
-		midelList.pareJson(midelImage);
+		if(midelImage != null)
+		{
+			midelList.pareJson(midelImage);
+		}
 		
 	}
 
