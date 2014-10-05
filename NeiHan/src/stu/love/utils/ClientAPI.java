@@ -23,7 +23,7 @@ public class ClientAPI {
 
 	/**
 		 * 功能:
-		 * 获取 内涵段子类表的 list 数据！
+		 * 获取 内涵段子列表 list 数据！
 		 * 
 		 * @param queue   			Volley  请求的队列,
 		 * 	避免每一次getList都创建queue 节省内存和空间
@@ -66,10 +66,8 @@ public class ClientAPI {
 			queue.add(new StringRequest(
 					Request.Method.GET,
 					path,
-					responseListner
-					, 
+					responseListner, 
 					new Response.ErrorListener() {
-	
 						@Override
 						public void onErrorResponse(VolleyError arg0) {
 							// TODO Auto-generated method stub
@@ -81,7 +79,5 @@ public class ClientAPI {
 			queue.start();
 		}
 
-	
-	
 	
 }

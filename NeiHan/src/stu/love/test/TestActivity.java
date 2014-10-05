@@ -7,8 +7,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import stu.love.bean.ADEntity;
 import stu.love.bean.ImageBean;
 import stu.love.bean.ImageUrlList;
+import stu.love.bean.TextEntity;
 import stu.love.neihan.R;
 import stu.love.utils.ClientAPI;
 import android.app.Activity;
@@ -41,10 +43,10 @@ public class TestActivity extends Activity implements Response.Listener<String> 
 
 		// Volley 请求队列
 		queue = Volley.newRequestQueue(this);
-		int itemCount = 30;
+		int itemCount = 10;
 
 		// 1 获取数据
-		ClientAPI.getList(queue, CATAGORY_IMAGE, itemCount, this);
+		ClientAPI.getList(queue, CATAGORY_TEXT, itemCount, this);
 
 	}
 
@@ -60,7 +62,6 @@ public class TestActivity extends Activity implements Response.Listener<String> 
 	public void onResponse(String arg0) {
 		// TODO Auto-generated method stub
 		// 返回的数据：
-		Log.i(Tag, "---list=" + arg0);
 
 		// 封装为工具类：
 		// 数据转化为JSON数据：
@@ -78,8 +79,45 @@ public class TestActivity extends Activity implements Response.Listener<String> 
 				for (int i = 0; i < len; i++) {
 // 					这种写法很乱！ 很不清晰！
 					JSONObject item = arr.getJSONObject(i);
-//					数据的解析：
-					new ImageBean().ParseJson(item);
+					
+					Log.i(Tag, "---item="+item);
+					
+//					获取类型 1 是段子 5 是广告
+					int type = item.getInt("type");
+					
+					if(type==1)
+					{
+//						TODO  处理段子
+						JSONObject group = item.getJSONObject("group");
+						int cid = group.getInt("category_id");
+						TextEntity entity= null;
+						if(cid == 1)
+						{
+//							TODO  文本段子
+							entity = new TextEntity();
+							
+						}else if(cid == 2)
+						{
+//							TODO  图片段子
+							entity = new ImageBean();
+						}
+//						解析数据：
+						entity.pareJson(item);
+						
+						long id = entity.getGroupId();
+						Log.i(Tag, "----getGroupId="+id);
+						
+					}else if(type==5)
+					{
+						
+//						TODO  处理广告的内容
+						ADEntity adEntity = new ADEntity();
+						adEntity.pareJson(item);
+						String url = adEntity.getDownloadUrl();
+						Log.i(Tag, "----adEntity.getDownloadUrl() ="+url);
+						
+					}
+					
 				}
 			}
 		} catch (Exception e) {
