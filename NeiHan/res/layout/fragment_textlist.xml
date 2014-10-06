@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+   <!--  -->
+    <TextView
+        android:id="@+id/textView_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="段子" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp" 
+        android:layout_weight="1" >
+	
+         <com.handmark.pulltorefresh.library.PullToRefreshListView  
+            android:id="@+id/textlist_pulltorefresh"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+             >         
+         </com.handmark.pulltorefresh.library.PullToRefreshListView>
+         <!--  
+        <ListView
+            android:id="@+id/textlist_listview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+        </ListView>
+        -->
+        <!--  快速工具条-->
+        <include 
+            android:id="@+id/textlist_quick_tools"
+         	layout="@layout/header_textlist_tool"    	
+            />     
+        <TextView 
+            android:id="@+id/textlist_new_notify"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="30条新数据"
+            android:background="#99000099"/>
+            
+        
+    </FrameLayout>
+      
+</LinearLayout>
